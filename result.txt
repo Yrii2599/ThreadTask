@@ -1,0 +1,40 @@
+A: 2   B: 8   C: -10.
+Discriminant value (144) > 0.
+Equation has 2 solutions: 1 ; -5
+
+A: 3   B: 7   C: 8 
+Disriminant value (-47) < 0. 
+Equation does not have solutions.
+
+A: 3   B: 7   C: 8 
+Disriminant value (-47) < 0. 
+Equation does not have solutions.
+
+A: 1   B: 9   C: 4.
+Discriminant value (65) > 0.
+Equation has 2 solutions: -0,47 ; -8,53
+
+A: 3   B: 5   C: 5 
+Disriminant value (-35) < 0. 
+Equation does not have solutions.
+
+A: 2   B: 5   C: 10 
+Disriminant value (-55) < 0. 
+Equation does not have solutions.
+
+A: 3   B: 5   C: 7 
+Disriminant value (-59) < 0. 
+Equation does not have solutions.
+
+A: 2   B: 1   C: -6.
+Discriminant value (49) > 0.
+Equation has 2 solutions: 1,5 ; -2
+
+A: 3   B: 5   C: 7 
+Disriminant value (-59) < 0. 
+Equation does not have solutions.
+
+A: 4   B: 6   C: -5.
+Discriminant value (116) > 0.
+Equation has 2 solutions: 0,6 ; -2,1
+
