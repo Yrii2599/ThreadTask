@@ -14,7 +14,9 @@ namespace ThreadSquareEquation
 {
     class FileWrite
     {
-        private readonly List<string> explanations;
+        private  List<string> _explanations;
+        private readonly List<Equation> _equations = new List<Equation>();
+        private List<string> _inputList = new List<string>();
         string path = @"C:\Users\Юра\source\repos\ThreadTask\FileForRead.txt";
         private readonly int _length;
 
@@ -22,7 +24,7 @@ namespace ThreadSquareEquation
         public FileWrite(int length)
         {
             _length = length;
-            explanations = new List<string>();
+            _explanations = new List<string>();
 
             Write();
 
@@ -46,60 +48,19 @@ namespace ThreadSquareEquation
             }
 
         }
-
-
-        public async Task Read()
+        public void SolveAndWrite()
         {
-            List<Task> listTasks = new List<Task>();
-            using StreamReader sr = new StreamReader(path: path);
-            Task lastTask = null;
-            for (int i = 0; i < _length; i++)
-            {
-                var newTask = new Task(() =>
-                {
-                    var res = TryRead(sr);
+            TryRead();
 
-                });
-                listTasks.Add(newTask);
-                if (lastTask == null)
-                {
-                    lastTask = newTask;
-                    lastTask.Start();
-                }
-                else
-                {
-                    await lastTask.ContinueWith(u => newTask.Start());
-                }
-            }
-
-            Task.WaitAll(listTasks.ToArray());
-
-
-        }
-
-        public async Task SolveAndWrite()
-        {
-
-            await Read();
-            List<Task> listTasks = new List<Task>();
+            List<Task<EqSolution>> listTasks = new List<Task<EqSolution>>();
+            EqSolver solver = new EqSolver();
             string pathResult = @"C:\Users\Юра\source\repos\ThreadTask\result.txt";
-            using StreamWriter sw =
-                new StreamWriter(path: pathResult, append: false, encoding: System.Text.Encoding.Default);
-
-            foreach (var item in explanations)
-            {
-                // listTasks.Add(Task.Run(() => { TryWrite(sw,item); }));
-                await TryWrite(sw, item);
-            }
-
-            // Task.WaitAll(listTasks.ToArray());
-
-
-
-
-
-
-
+            _equations.ForEach(item=>listTasks.Add(Task.Factory.StartNew(()=>solver.ResolveEquation(item).Result)));
+            Task.WaitAll(listTasks.ToArray());
+            _explanations=listTasks.Select(e=>e.Result.Explanation).ToList();
+        
+                File.WriteAllLines(pathResult,_explanations);
+                
 
             //stopWatch.Start();
             //EqSolver solver = new EqSolver();
@@ -116,76 +77,35 @@ namespace ThreadSquareEquation
 
         }
 
-        private async Task<string> TryRead(StreamReader sr, int number = 0)
+        private void TryRead()
         {
-            List<Task> listTasks = new List<Task>();
-            if (number > 20)
-            {
-                return null;
-            }
 
-            try
-            {
-                var str = sr.ReadLineAsync();
-                listTasks.Add(str);
-                if (str.Result == null)
-                {
-                    return str.Result;
-                }
 
-                listTasks.Add(Task.Run(() =>
+            
+                var str = File.ReadAllLines(path);
+                _inputList = str.ToList();
+                foreach (var item in _inputList)
                 {
-                    var res = str.Result;
-                    if (res != null)
+                    Equation equation = new Equation();
+                    string[] abc = new string[2];
+                    abc = item.Split();
+                    if (double.TryParse(abc[0], out double a)
+                        && double.TryParse(abc[1], out double b)
+                        && double.TryParse(abc[2], out double c))
                     {
-                        var abc = res.Split();
-                        if (double.TryParse(abc[0], out double a)
-                            && double.TryParse(abc[1], out double b)
-                            && double.TryParse(abc[2], out double c))
+                        EqSolver solver = new EqSolver();
+                        var equ = new Equation()
                         {
-                            EqSolver solver = new EqSolver();
-                            var equ = new Equation()
-                            {
-                                A = a,
-                                B = b,
-                                C = c
-                            };
-                            var result = solver.ResolveEquation(equ).Result.Explanation;
-                            explanations.Add(result);
-                            Console.WriteLine(result);
-                        }
+                            A = a,
+                            B = b,
+                            C = c
+                        };
+                        _equations.Add(equ);
                     }
-                }));
-                Task.WaitAll(listTasks.ToArray());
-                Thread.Sleep(1000);
-                return str.Result;
-
-            }
-            catch
-            {
-                return await TryRead(sr, ++number);
-
-            }
-
+                }
         }
 
-        private async Task TryWrite(StreamWriter sw, string s, int number = 0)
-        {
-            if (number > 10)
-            {
-                return;
-            }
-
-            try
-            {
-                await sw.WriteLineAsync(s);
-            }
-            catch
-            {
-                await TryWrite(sw, s, ++number);
-
-            }
-        }
+        
 
     }
 }

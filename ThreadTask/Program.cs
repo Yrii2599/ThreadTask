@@ -13,7 +13,7 @@ namespace ThreadTask
                 Stopwatch stopWatch = new Stopwatch();
                 FileWrite f = new FileWrite(10);
                 stopWatch.Start();
-                await f.SolveAndWrite();
+              f.SolveAndWrite();
                 stopWatch.Stop();
                 Console.WriteLine(value: $" seconds {stopWatch.Elapsed.Seconds}  ms {stopWatch.Elapsed.Milliseconds}");
             }
